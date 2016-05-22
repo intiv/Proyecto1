@@ -1,22 +1,22 @@
 #include "carta.h"
 #include<string>
+#include<sstream>
+
 
 using std::string;
+using std::stringstream;
+using std::endl;
 
 carta::carta(){
 
 }
 
-carta::carta(string symbol, char letter){
+carta::carta(char symbol, char letter){
 	this->simbolo=symbol;
 	this->letra=letter;
 }
-/*
-carta::carta(string symbol, string colour, int numero){
-	set
-}
-*/
-void carta::setSimbolo(string simbolo){
+
+void carta::setSimbolo(char simbolo){
 	this->simbolo=simbolo;
 }
 
@@ -24,10 +24,16 @@ void carta::setLetra(char letra){
 	this->letra=letra;
 }
 
-string carta::getSimbolo(){
+char carta::getSimbolo(){
 	return this->simbolo;
 }
 
 char carta::getLetra(){
 	return this->letra;
+}
+
+string carta::toString(){
+	stringstream ss;
+	ss<<this->simbolo<<"  "<<this->letra<<endl;
+	return ss.str();
 }

@@ -1,5 +1,7 @@
+
 #ifndef CARTA_H
 #define CARTA_H
+#pragma once
 #include<ncurses.h>
 #include<string>
 
@@ -8,18 +10,16 @@ class carta{
 	public:
 		
 		carta();
-		carta(string,char);
+		carta(char,char);
 		
-		string getSimbolo();
-		void setSimbolo(string);
+		char getSimbolo();
+		void setSimbolo(char);
 		void setLetra(char);
 		char getLetra();
+		string toString();
 	private:
-		string simbolo;
+		char simbolo;
 		char letra;
 };
-
-
-
 
 #endif
