@@ -2,7 +2,7 @@
 #include<ncurses.h>
 #include<iostream>
 #include<string>
-#include<fstream>
+//#include<fstream>
 #include<sstream>
 #include<cstdlib>
 #include<ctime>
@@ -11,8 +11,8 @@
 using std::atoi;
 using std::stringstream;
 using std::vector;
-using std::ifstream;
-using std::ofstream;
+//using std::ifstream;
+//using std::ofstream;
 using std::string;
 using std::cout;
 using std::cin;
@@ -33,8 +33,9 @@ bool Flush(carta*,unsigned int);
 bool FullHouse(carta*,unsigned int);
 bool CuatroIguales(carta*,unsigned int);
 bool EscaleraReal(carta*,unsigned int);
-int GetApuesta(int&);
+unsigned int GetApuesta(unsigned int&);
 void Random2(carta*,carta*,vector<int>&,int*,int);
+void Jugada(carta*,unsigned int,unsigned int,unsigned int&);
 
 int main(int argc, char* argv[]){
 	srand(time(0));
@@ -49,9 +50,9 @@ int main(int argc, char* argv[]){
 	}*/
 	//raw();
 	noecho();	
-	ifstream reader("Datos.txt");
+	/*ifstream reader("Datos.txt");
 	string line;
-	int Dinero;
+	unsigned int Dinero;
 	getline(reader,line);
 	stringstream ss(line);
 	vector<string> datos;
@@ -65,7 +66,7 @@ int main(int argc, char* argv[]){
 		
 		printw("Hay un juego guardado, su dinero anterior era: %d \n",DineroCargado);
 		printw("Desea jugar con este dinero?\n");
-		printw("S = Continuar partida con %d dolares\nN = Empezar de nuevo con 200 dolares",DineroCargado);
+		printw("S = Continuar partida con %d dolares\nN = Empezar de nuevo con 200 dolares\n",DineroCargado);
 		int input=getch();
 		if(input==115){
 			Dinero=DineroCargado;
@@ -75,7 +76,8 @@ int main(int argc, char* argv[]){
 		}
 	}else{
 		Dinero=200;
-	}
+	}*/
+	unsigned int Dinero=100;
 	const unsigned int size=52;
 	carta* Deck=new carta[size];
 	if(!Deck){
@@ -87,24 +89,38 @@ int main(int argc, char* argv[]){
 		const unsigned int HandSize=5;
 		carta* mano=new carta[HandSize];
 		while(continuar){
-			draw(mano,Deck,HandSize,size);
-			PrintHand(mano,HandSize);
-			mvprintw(16,0,"Dinero: %d",Dinero);
-			int apuesta=GetApuesta(Dinero);
-			refresh();
-			ClearScreen();
-			PrintHand(mano,HandSize);
-			mvprintw(16,0,"Dinero: %d",Dinero);
-			mvprintw(17,0,"Apuesta: %d\n",apuesta);	
-			if(apuesta==0){
-				continuar=false;
-			}else{
-				move(17,0);
+			if(Dinero>0){	
+				draw(mano,Deck,HandSize,size);
+				PrintHand(mano,HandSize);
+				mvprintw(16,0,"Dinero: %d",Dinero);
+				int apuesta=GetApuesta(Dinero);
 				refresh();
-				Cambiar(Deck,mano,size,HandSize);
 				ClearScreen();
 				PrintHand(mano,HandSize);
-				
+				mvprintw(16,0,"Dinero: %d",Dinero);
+				mvprintw(17,0,"Apuesta: %d",apuesta);	
+				if(apuesta==0){
+					continuar=false;
+				}else{
+					move(17,0);
+					refresh();
+					printw("Desea Cambiar cartas [S= Si/N= No]? ");
+					char change=getch();
+					if(change=='s'||change=='S'){
+						Cambiar(Deck,mano,size,HandSize);
+						ClearScreen();
+						mvprintw(16,0,"Dinero: %d",Dinero);
+						mvprintw(17,0,"Apuesta: %d",apuesta);
+						PrintHand(mano,HandSize);
+						
+					}
+					getch();
+					Jugada(mano,HandSize,apuesta,Dinero);
+				}
+			}else{
+				ClearScreen();
+				mvprintw(0,0,"Ya no tiene dinero");
+				continuar=false;
 			}
 		}
 		delete[] Deck;
@@ -116,9 +132,127 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
+void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int &Dinero){
+/*	if(EscaleraReal(mano,HandSize)){
+		apuesta*=250;
+		ClearScreen();
+		int col,row;
+		getmaxyx(stdscr,row,col);
+		mvprintw(row/2,col/2 - 5,"ESCALERA REAL!");
+		mvprintw(row/2 + 1,col/2 - 5,"GANASTE %d !!!",apuesta);
+		Dinero+=apuesta;
+		
+	}else if(CuatroIguales(mano,HandSize)){
+
+	}else if(FullHouse(mano,HandSize)){
+
+	}else if(Flush(mano,HandSize)){
+
+	}else if(Escalera(mano,HandSize)){
+
+	}else if(Trio(mano,HandSize)){
+
+	}else*/ if(DosPar(mano,HandSize)){
+
+	}else if(Par(mano,HandSize)){
+
+	}else{
+		
+		ClearScreen();
+		mvprintw(0,0,"Ninguno");
+		getch();
+	}	
+}
+
+bool EscaleraReal(carta* mano,unsigned int HandSize){
+
+}
+
+bool CuatroIguales(carta* mano,unsigned int HandSize){
+
+}
+
+bool FullHouse(carta* mano,unsigned int HandSize){
+
+}
+
+bool Flush(carta* mano,unsigned int HandSize){
+
+}
+
+bool Escalera(carta* mano,unsigned int HandSize){
+
+}
+
+bool Trio(carta* mano,unsigned int HandSize){
+
+}
+
+bool DosPar(carta* mano,unsigned int HandSize){
+	int cont=0,cont2=0;
+	vector<int> VPs;
+	bool valid=true;
+	for(int i=0;i<HandSize;i++){
+		cont2=0;
+		for(int k=0;k<VPs.size();k++){
+			if(i==VPs.at(k)){
+				cont2++;
+			}
+		}
+		if(cont2>0){
+			valid=false;
+		}
+		if(valid){
+			
+			if(mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'||mano[i].getLetra()=='A'){
+				char temp=mano[i].getLetra();
+				for(int j=0;j<HandSize;j++){
+					if(i!=j){
+						if(temp==mano[j].getLetra()){
+							VPs.push_back(j);
+							cont++;
+							j=HandSize;
+						}
+					}	
+				}	
+			}
+		}
+		valid=true;
+	}
+	if(cont==2){	
+		ClearScreen();
+		mvprintw(0,0,"Dos pares!");
+		getch();
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool Par(carta* mano,unsigned int HandSize){
+	for(int i=0;i<HandSize;i++){
+		if(mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'||mano[i].getLetra()=='A'){
+			for(int j=0;j<HandSize;j++){
+				if(i!=j){
+					if(mano[i].getLetra()==mano[j].getLetra()){
+						
+						ClearScreen();
+						mvprintw(0,0,"Par!");
+						getch();
+						return true;
+					}
+				}
+			
+			}
+		
+		}
+	}
+	return false;
+}
+
 void Cambiar(carta* deck, carta* mano, unsigned int size, unsigned int handS){
 	echo();
-	printw("Ingrese los numeros de las cartas que desea cambiar, separados por comas (',')  Ejemplo: (1,3,5)\n");
+	mvprintw(18,0,"Ingrese los numeros de las cartas que desea cambiar, separados por comas (',')  Ejemplo: (1,3,5)\n");
 	char CurrChar;
 	string input="";
 		while((CurrChar=getch())!=10){
@@ -149,21 +283,16 @@ void Cambiar(carta* deck, carta* mano, unsigned int size, unsigned int handS){
 //terminar
 	vector<int> NIndex;
 	Random2(deck,mano,NIndex,DeckIndex,indices.size());
-	mvprintw(28,0,"NIndexes: ");
-	for(int i=0;i<NIndex.size();i++){
-		mvprintw(29+i,0,"%d",NIndex.at(i));
-	}	
 	for(int i=0;i<indices.size();i++){
 		mano[HandIndex[i]]=deck[NIndex.at(i)];
 	}
 	ClearScreen();
 	PrintHand(mano,handS);
-	getch();
 }
 
 
 
-int GetApuesta(int &Dinero){
+unsigned int GetApuesta(unsigned int &Dinero){
 	echo();
 	int bet;
 	bool ValidBet=false;
