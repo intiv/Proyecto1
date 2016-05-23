@@ -33,6 +33,7 @@ bool Escalera(carta*,unsigned int);
 bool Flush(carta*,unsigned int);
 bool FullHouse(carta*,unsigned int);
 bool CuatroIguales(carta*,unsigned int);
+bool StraightFlush(carta*,unsigned int);
 bool EscaleraReal(carta*,unsigned int);
 unsigned int GetApuesta(unsigned int&);
 void Random2(carta*,carta*,vector<int>&,int*,int);
@@ -40,16 +41,7 @@ void Jugada(carta*,unsigned int,unsigned int,unsigned int&);
 
 int main(int argc, char* argv[]){
 	srand(time(0));
-	initscr();
-/*	int c; // Para verificar codigo de teclas
-	noecho();
-	while((c=getch())!=27){
-		
-		printw("Tecla: %c, codigo: %d \n",c,c);
-		move(0,0);
-		refresh();
-	}*/
-	//raw();
+	initscr();	
 	noecho();	
 	/*ifstream reader("Datos.txt");
 	string line;
@@ -87,13 +79,21 @@ int main(int argc, char* argv[]){
 	}else{
 		bool continuar=true;
 		CrearDeck(Deck,size);	
+		int x;
+		cin>>x;
+		initscr();
 		const unsigned int HandSize=5;
 		carta* mano=new carta[HandSize];
 		while(continuar){
 			if(Dinero>0){	
-				draw(mano,Deck,HandSize,size);
-				PrintHand(mano,HandSize);
+				//draw(mano,Deck,HandSize,size);
+				mano[0]=Deck[8];
+				mano[1]=Deck[9];
+				mano[2]=Deck[10];
+				mano[3]=Deck[11];
+				mano[4]=Deck[12];
 				mvprintw(16,0,"Dinero: %d",Dinero);
+				PrintHand(mano,HandSize);
 				int apuesta=GetApuesta(Dinero);
 				refresh();
 				ClearScreen();
@@ -168,25 +168,49 @@ void sort(carta* mano,unsigned int HandSize){
 }
  
 void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int &Dinero){
-/*	if(EscaleraReal(mano,HandSize)){
-		apuesta*=250;
-		ClearScreen();
-		int col,row;
+	ClearScreen();
+	
+				mvprintw(15,0,"%d de %c valor %d",+mano[0].getLetra(),mano[0].getSimbolo(),mano[0].getValor());		
+				mvprintw(16,0,"%c de %c valor %d",+mano[1].getLetra(),mano[1].getSimbolo(),mano[1].getValor());
+				mvprintw(17,0,"%c de %c valor %d",+mano[2].getLetra(),mano[2].getSimbolo(),mano[2].getValor());
+				mvprintw(18,0,"%c de %c valor %d",+mano[3].getLetra(),mano[3].getSimbolo(),mano[3].getValor());
+				mvprintw(19,0,"%c de %c valor %d",+mano[4].getLetra(),mano[4].getSimbolo(),mano[4].getValor());
+	if(EscaleraReal(mano,HandSize)){
+		/*int col,row;
 		getmaxyx(stdscr,row,col);
 		mvprintw(row/2,col/2 - 5,"ESCALERA REAL!");
 		mvprintw(row/2 + 1,col/2 - 5,"GANASTE %d !!!",apuesta);
-		Dinero+=apuesta;
-		
+		Dinero+=apuesta;*/
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"ESOCAREEEERA REEEEEEEEEEEEEEEEEEEEEEEARUUUUUUUUUUUUUUUUUUUUUUUUUU");
+		getch();
+	}else if(StraightFlush(mano,HandSize)){
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"STORAITOOO FUROSHU!!!!!");
+		getch();
 	}else if(CuatroIguales(mano,HandSize)){
 
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"CUATRO FANTASTICOS!!!");
+		getch();
 	}else if(FullHouse(mano,HandSize)){
-
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"FULL HOUSE!!!");
+		getch();
 	}else if(Flush(mano,HandSize)){
-
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"FLUUUUUUUUUUUUUSHHHHH!!!");
+		getch();
 	}else if(Escalera(mano,HandSize)){
-
-	}else*/
-	 if(Trio(mano,HandSize)){
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"EEEEEEESCALERAAAAAAAAAAAA!!!"); getch();
+	}else if(Trio(mano,HandSize)){
 		ClearScreen();
 		PrintHand(mano,HandSize);
 		mvprintw(0,0,"TRIO PERROOOOO!!!");
@@ -210,23 +234,57 @@ void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int 
 }
 
 bool EscaleraReal(carta* mano,unsigned int HandSize){
+	if(mano[0].getValor()==10&&mano[1].getValor()==11&&mano[2].getValor()==12&&mano[3].getValor()==13&&mano[4].getValor()==14&&StraightFlush(mano,HandSize)){
+		return true;
+	}else{
+		return false;
+	}
+}
 
+bool StraightFlush(carta* mano,unsigned int HandSize){
+	if(Escalera(mano,HandSize)&&Flush(mano,HandSize)){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 bool CuatroIguales(carta* mano,unsigned int HandSize){
-
+	if(mano[0].getValor()==mano[1].getValor()&&mano[0].getValor()==mano[2].getValor()&&mano[0].getValor()==mano[3].getValor()){
+		return true;
+	}else if(mano[1].getValor()==mano[2].getValor()&&mano[1].getValor()==mano[3].getValor()&&mano[1].getValor()==mano[4].getValor()){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 bool FullHouse(carta* mano,unsigned int HandSize){
-
+	if((mano[0].getValor()==mano[1].getValor())&&(mano[2].getValor()==mano[3].getValor()&&mano[2].getValor()==mano[4].getValor())){
+		return true;
+	}else if((mano[0].getValor()==mano[1].getValor()&&mano[0].getValor()==mano[2].getValor())&&(mano[3].getValor()==mano[4].getValor())){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 bool Flush(carta* mano,unsigned int HandSize){
-
+	if(mano[0].getSimbolo()==mano[1].getSimbolo()&&mano[0].getSimbolo()==mano[2].getSimbolo()&&mano[0].getSimbolo()==mano[3].getSimbolo()&&mano[0].getSimbolo()==mano[4].getSimbolo()){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 bool Escalera(carta* mano,unsigned int HandSize){
-
+	if(mano[0].getValor()==2&&mano[1].getValor()==3&&mano[2].getValor()==4&&mano[3].getValor()==5&&mano[4].getValor()==14){
+		return true;
+	}else if((mano[0].getValor()==(mano[1].getValor()-1))&&(mano[0].getValor()==(mano[2].getValor()-2))&&(mano[0].getValor()==(mano[3].getValor()-3))&&(mano[0].getValor()==(mano[4].getValor()-4))){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 bool Trio(carta* mano,unsigned int HandSize){
@@ -648,9 +706,8 @@ void CrearDeck(carta* Deck,unsigned int size){
 		Deck[49]=carta(simbolo,'J',11);
 		Deck[50]=carta(simbolo,'Q',12);
 		Deck[51]=carta(simbolo,'K',13);
-		/*
-
-		for(int i=0;i<size;i++){
+	
+		/*for(int i=0;i<size;i++){
 			cout<<Deck[i].getSimbolo()<<"\t";
 			if(Deck[i].getLetra()=='A'||Deck[i].getLetra()=='J'||Deck[i].getLetra()=='Q'||Deck[i].getLetra()=='K'){
 				cout<<Deck[i].getLetra();
