@@ -18,6 +18,7 @@ using std::cout;
 using std::cin;
 using std::endl;
 
+void sort(carta*,unsigned int);
 void CrearDeck(carta*,unsigned int);
 void draw(carta*,carta*,unsigned int,unsigned int);
 int Random(carta*,int*,unsigned int,unsigned int);
@@ -114,6 +115,7 @@ int main(int argc, char* argv[]){
 						PrintHand(mano,HandSize);
 						
 					}
+					sort(mano,HandSize);
 					getch();
 					Jugada(mano,HandSize,apuesta,Dinero);
 				}
@@ -132,6 +134,39 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
+void sort(carta* mano,unsigned int HandSize){
+	carta temp;
+	mvprintw(25,0,"Cartas antes de sort:");
+	for(int i=0,j=0;i<HandSize;i++){
+		if(mano[i].getLetra()=='A'||mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'){
+			mvprintw(26+i,j,"%c de %c valor %d",mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
+		}else{	
+			mvprintw(26+i,j,"%d de %c valor %d",+mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
+		}
+	}
+
+	for(int i=0;i<HandSize;i++){
+		for(int j=0;j<HandSize-1;j++){
+			if(mano[j].getValor()>mano[j+1].getValor()){
+				temp=mano[j];
+				mano[j]=mano[j+1];
+				mano[j+1]=temp;
+			}
+		}
+
+	}
+
+	mvprintw(32,0,"Cartas despues del sort:");
+	for(int i=0,j=0;i<HandSize;i++){
+		if(mano[i].getLetra()=='A'||mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'){
+			mvprintw(33+i,j,"%c de %c valor %d",mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
+		}else{	
+			mvprintw(33+i,j,"%d de %c valor %d",+mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
+		}
+	}
+
+}
+ 
 void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int &Dinero){
 /*	if(EscaleraReal(mano,HandSize)){
 		apuesta*=250;
@@ -150,12 +185,22 @@ void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int 
 
 	}else if(Escalera(mano,HandSize)){
 
-	}else if(Trio(mano,HandSize)){
-
-	}else*/ if(DosPar(mano,HandSize)){
-
+	}else*/
+	 if(Trio(mano,HandSize)){
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(0,0,"TRIO PERROOOOO!!!");
+		getch();
+	}else if(DosPar(mano,HandSize)){
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"Dos Pares!!!");
+		getch();	
 	}else if(Par(mano,HandSize)){
-
+		ClearScreen();
+		PrintHand(mano,HandSize);
+		mvprintw(20,0,"PAR!!!!");
+		getch();
 	}else{
 		
 		ClearScreen();
@@ -185,48 +230,53 @@ bool Escalera(carta* mano,unsigned int HandSize){
 }
 
 bool Trio(carta* mano,unsigned int HandSize){
-
+	for(int i=0;i<3;i++){
+			if(mano[i].getLetra()==mano[i+1].getLetra()&&mano[i].getLetra()==mano[i+2].getLetra()){
+				return true;
+			}
+	}
+	return false;
 }
 
 bool DosPar(carta* mano,unsigned int HandSize){
-	int cont=0,cont2=0;
-	vector<int> VPs;
-	bool valid=true;
+	int index;
 	for(int i=0;i<HandSize;i++){
-		cont2=0;
-		for(int k=0;k<VPs.size();k++){
-			if(i==VPs.at(k)){
-				cont2++;
-			}
+		if(mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'||mano[i].getLetra()=='A'){
+			index=i;
+			i=HandSize;
 		}
-		if(cont2>0){
-			valid=false;
-		}
-		if(valid){
-			
-			if(mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'||mano[i].getLetra()=='A'){
-				char temp=mano[i].getLetra();
-				for(int j=0;j<HandSize;j++){
-					if(i!=j){
-						if(temp==mano[j].getLetra()){
-							VPs.push_back(j);
-							cont++;
-							j=HandSize;
-						}
-					}	
-				}	
-			}
-		}
-		valid=true;
 	}
-	if(cont==2){	
-		ClearScreen();
-		mvprintw(0,0,"Dos pares!");
-		getch();
-		return true;
+	if(index<=1){
+		if(index==0){
+			if((mano[0].getLetra()=='J'||mano[0].getLetra()=='Q'||mano[0].getLetra()=='K'||mano[0].getLetra()=='A')&&
+			   (mano[3].getLetra()=='J'||mano[3].getLetra()=='Q'||mano[3].getLetra()=='K'||mano[0].getLetra()=='A')){
+				if((mano[0].getLetra()==mano[1].getLetra())&&(mano[2].getLetra()==mano[3].getLetra())){
+					return true;
+				}else{
+					 return false; 
+				}
+			}else{
+				return false;
+			}
+		}else if(index==1){
+			if((mano[1].getLetra()=='J'||mano[1].getLetra()=='Q'||mano[1].getLetra()=='K'||mano[1].getLetra()=='A')&&
+			   (mano[4].getLetra()=='J'||mano[4].getLetra()=='Q'||mano[4].getLetra()=='K'||mano[4].getLetra()=='A')){
+				if((mano[1].getLetra()==mano[2].getLetra())&&(mano[3].getLetra()==mano[4].getLetra())){
+					return true;
+				}else{
+					 return false; 
+				}
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+
 	}else{
 		return false;
 	}
+	
 }
 
 bool Par(carta* mano,unsigned int HandSize){
@@ -235,16 +285,10 @@ bool Par(carta* mano,unsigned int HandSize){
 			for(int j=0;j<HandSize;j++){
 				if(i!=j){
 					if(mano[i].getLetra()==mano[j].getLetra()){
-						
-						ClearScreen();
-						mvprintw(0,0,"Par!");
-						getch();
 						return true;
 					}
 				}
-			
 			}
-		
 		}
 	}
 	return false;
@@ -280,7 +324,6 @@ void Cambiar(carta* deck, carta* mano, unsigned int size, unsigned int handS){
 			}
 		}
 	}
-//terminar
 	vector<int> NIndex;
 	Random2(deck,mano,NIndex,DeckIndex,indices.size());
 	for(int i=0;i<indices.size();i++){
@@ -563,48 +606,48 @@ void PrintHand(carta* mano, unsigned int HandS){
 
 void CrearDeck(carta* Deck,unsigned int size){
 		char simbolo='T';
-		Deck[0]=carta(simbolo,'A');
+		Deck[0]=carta(simbolo,'A',14);
 		int cont=2;
 		for(int i=1;i<10;i++){
-			Deck[i]=carta(simbolo,cont);
+			Deck[i]=carta(simbolo,cont,cont);
 			cont++;
 		}
-		Deck[10]=carta(simbolo,'J');
-		Deck[11]=carta(simbolo,'Q');
-		Deck[12]=carta(simbolo,'K');
+		Deck[10]=carta(simbolo,'J',11);
+		Deck[11]=carta(simbolo,'Q',12);
+		Deck[12]=carta(simbolo,'K',13);
 
 		simbolo='C';
 		cont=2;
-		Deck[13]=carta(simbolo,'A');
+		Deck[13]=carta(simbolo,'A',14);
 		for(int i=14;i<23;i++){
-			Deck[i]=carta(simbolo,cont);
+			Deck[i]=carta(simbolo,cont,cont);
 			cont++;
 		}
-		Deck[23]=carta(simbolo,'J');
-		Deck[24]=carta(simbolo,'Q');
-		Deck[25]=carta(simbolo,'K');
+		Deck[23]=carta(simbolo,'J',11);
+		Deck[24]=carta(simbolo,'Q',12);
+		Deck[25]=carta(simbolo,'K',13);
 		
 		cont=2;
 		simbolo='P';
-		Deck[26]=carta(simbolo,'A');
+		Deck[26]=carta(simbolo,'A',14);
 		for(int i=27;i<36;i++){
-			Deck[i]=carta(simbolo,cont);
+			Deck[i]=carta(simbolo,cont,cont);
 			cont++;
 		}
-		Deck[36]=carta(simbolo,'J');
-		Deck[37]=carta(simbolo,'Q');
-		Deck[38]=carta(simbolo,'K');
+		Deck[36]=carta(simbolo,'J',11);
+		Deck[37]=carta(simbolo,'Q',12);
+		Deck[38]=carta(simbolo,'K',13);
 		
 		cont=2;
 		simbolo='D';
-		Deck[39]=carta(simbolo,'A');
+		Deck[39]=carta(simbolo,'A',14);
 		for(int i=40;i<49;i++){
-			Deck[i]=carta(simbolo,cont);
+			Deck[i]=carta(simbolo,cont,cont);
 			cont++;
 		}
-		Deck[49]=carta(simbolo,'J');
-		Deck[50]=carta(simbolo,'Q');
-		Deck[51]=carta(simbolo,'K');
+		Deck[49]=carta(simbolo,'J',11);
+		Deck[50]=carta(simbolo,'Q',12);
+		Deck[51]=carta(simbolo,'K',13);
 		/*
 
 		for(int i=0;i<size;i++){
