@@ -90,16 +90,16 @@ int main(int argc, char* argv[]){
 		}
 		ClearScreen();
 		mvprintw(row/2-4,col/2-20,"*-----------------------------------------------*");
-		mvprintw(row/2-3,col/2-20,"|						   |");
-		mvprintw(row/2-2,col/2-20,"|	     ******************************        |");
-		mvprintw(row/2-1,col/2-20,"| 	     *BIENVENIDO AL CASINO DEL SOL*        |");
-		mvprintw(row/2,col/2-20,"|	     ******************************       |");
-		mvprintw(row/2+1,col/2-20,"|					           |");
-		mvprintw(row/2+2,col/2-20,"|		1.- JUGAR POKER INCA	           |");
-		mvprintw(row/2+3,col/2-20,"|		2.- COMO JUGAR POKER INCA          |");
-		mvprintw(row/2+4,col/2-20,"|		3.- SALIR DEL CASINO	           |");
-		mvprintw(row/2+5,col/2-20,"|					           |");
-		mvprintw(row/2+6,col/2-20,"|					           |");
+		mvprintw(row/2-3,col/2-20,"|						 |");
+		mvprintw(row/2-2,col/2-20,"|	     ******************************      |");
+		mvprintw(row/2-1,col/2-20,"| 	     *BIENVENIDO AL CASINO DEL SOL*      |");
+		mvprintw(row/2,col/2-20,"|	     ******************************      |");
+		mvprintw(row/2+1,col/2-20,"|					         |");
+		mvprintw(row/2+2,col/2-20,"|		1.- JUGAR POKER INCA	         |");
+		mvprintw(row/2+3,col/2-20,"|		2.- COMO JUGAR POKER INCA        |");
+		mvprintw(row/2+4,col/2-20,"|		3.- SALIR DEL CASINO	         |");
+		mvprintw(row/2+5,col/2-20,"|					         |");
+		mvprintw(row/2+6,col/2-20,"|					         |");
 		mvprintw(row/2+7,col/2-20,"*-----------------------------------------------*");
 		int opcion=getch();
 		if(opcion==49){
@@ -124,25 +124,20 @@ int main(int argc, char* argv[]){
 			mvprintw(row/2+4,col/2-20,"|                                                                     |");
 			mvprintw(row/2+5,col/2-20,"| -Posibles manos: Par x1, 2 Pares x2, Trio x3, Escalera x4, Flush x5 |");
 			mvprintw(row/2+6,col/2-20,"| Full House x9, 4Iguales x25, StraightFlush x50, ESCALERA REAL x250  |");
-			mvprintw(row/2+7,col/2-20,"|                                                                     |");
+			mvprintw(row/2+7,col/2-20,"| -D=Diamantes, C=Corazones, P=Picas, T=Treboles.                     |");
 			mvprintw(row/2+8,col/2-20,"| -Al haber leido las instrucciones, usted esta listo para:           |");
 			mvprintw(row/2+9,col/2-20,"| ~Apostar en Grande                                                  |");
 			mvprintw(row/2+10,col/2-20,"| ~Ganar en Grande                                                    |");
 			mvprintw(row/2+11,col/2-20,"|                                                                     |");
 			mvprintw(row/2+12,col/2-20,"|               Presiona cualquier tecla para continuar               |");
 			mvprintw(row/2+13,col/2-20,"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
-			int s=getch();
-			endwin();
-			return 0;
-
+			getch();
 		}
 		const unsigned int HandSize=5;
 		carta* mano=new carta[HandSize];
 		while(continuar){
 			if(nRonda){
 				ClearScreen();
-				char curr;
-				string input="";
 				int op;
 				mvprintw(row/2-1,col/2-10,"-------------------");
 				mvprintw(row/2,col/2-10,"| Elija una opcion  |");
@@ -150,42 +145,41 @@ int main(int argc, char* argv[]){
 				mvprintw(row/2+2,col/2-20,"1.- Volver a jugar con %d dolares",Dinero);
 				mvprintw(row/2+3,col/2-20,"2.- Empezar nueva ronda con 100 dolares",Dinero);
 				mvprintw(row/2+4,col/2-20,"3.- Salir del juego",Dinero);
-				move(row/2+5,col/2-10);
 				op=getch();
 				if(op==49){
 					
 				}else if(op==50){
 					Dinero=100;
-				}else if(op==53){
+				}else if(op==51){
+					ClearScreen();
 					continuar=false;
 					break;
 				}
 			}
 			if(Dinero>0){	
 				draw(mano,Deck,HandSize,size);
-				mvprintw(16,0,"Dinero: %d",Dinero);
 				PrintHand(mano,HandSize);
+				mvprintw(22,0,"Dinero: %d",Dinero);
 				int apuesta=GetApuesta(Dinero);
-				refresh();
-				ClearScreen();
-				PrintHand(mano,HandSize);
-				mvprintw(16,0,"Dinero: %d",Dinero);
-				mvprintw(17,0,"Apuesta: %d",apuesta);	
+				mvprintw(22,0,"Dinero: %d",Dinero);
+				mvprintw(23,0,"Apuesta: %d",apuesta);
+				refresh();	
 				if(apuesta==0){
 					nRonda=true;
 				}else{
-					move(17,0);
-					refresh();
-					printw("Desea Cambiar cartas [S= Si/N= No]? ");
+					PrintHand(mano,HandSize);
+					mvprintw(22,0,"Dinero: %d",Dinero);
+					mvprintw(23,0,"Apuesta: %d",apuesta);
+					mvprintw(18,0,"Desea Cambiar cartas [S= Si/N= No]? ");
 					char change=getch();
 					if(change=='s'||change=='S'){
 						Cambiar(Deck,mano,size,HandSize);
 						ClearScreen();	
 					}
-					mvprintw(16,0,"Dinero: %d",Dinero);
-					mvprintw(17,0,"Apuesta: %d",apuesta);
 					PrintHand(mano,HandSize);
 					sort(mano,HandSize);
+					mvprintw(20,0,"Dinero: %d",Dinero);
+					mvprintw(21,0,"Apuesta: %d",apuesta);
 					mvprintw(18,0,"Esta es su nueva mano, Presiona cualquier tecla para ver el resultado!");
 					getch();
 					Jugada(mano,HandSize,apuesta,Dinero);
@@ -198,8 +192,7 @@ int main(int argc, char* argv[]){
 		}
 		int maxy,maxx;
 		getmaxyx(stdscr,maxy,maxx);
-		mvprintw(maxy/2,maxx/2,"GRACIAS POR JUGAR!");
-		
+		mvprintw(maxy/2-10,maxx/2-10,"GRACIAS POR JUGAR!");
 		delete[] Deck;
 		delete[] mano;
 		Deck=NULL;
@@ -212,15 +205,6 @@ int main(int argc, char* argv[]){
 
 void sort(carta* mano,unsigned int HandSize){
 	carta temp;
-	mvprintw(25,0,"Cartas antes de sort:");
-	for(int i=0,j=0;i<HandSize;i++){
-		if(mano[i].getLetra()=='A'||mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'){
-			mvprintw(26+i,j,"%c de %c valor %d",mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
-		}else{	
-			mvprintw(26+i,j,"%d de %c valor %d",+mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
-		}
-	}
-
 	for(int i=0;i<HandSize;i++){
 		for(int j=0;j<HandSize-1;j++){
 			if(mano[j].getValor()>mano[j+1].getValor()){
@@ -229,18 +213,7 @@ void sort(carta* mano,unsigned int HandSize){
 				mano[j+1]=temp;
 			}
 		}
-
 	}
-
-	mvprintw(32,0,"Cartas despues del sort:");
-	for(int i=0,j=0;i<HandSize;i++){
-		if(mano[i].getLetra()=='A'||mano[i].getLetra()=='J'||mano[i].getLetra()=='Q'||mano[i].getLetra()=='K'){
-			mvprintw(33+i,j,"%c de %c valor %d",mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
-		}else{	
-			mvprintw(33+i,j,"%d de %c valor %d",+mano[i].getLetra(),mano[i].getSimbolo(),mano[i].getValor());
-		}
-	}
-
 }
  
 void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int &Dinero){
@@ -294,8 +267,9 @@ void Jugada(carta* mano,unsigned int HandSize,unsigned int apuesta,unsigned int 
 		mvprintw(row/2 + 1,col/2 - 5,"GANASTE %d !!!",apuesta);
 		Dinero+=apuesta;
 	}else{
-		mvprintw(row/2,col/2-5,"PERDISTE!\nTRY AGAIN");
+		mvprintw(row/2,col/2-5,"PERDISTE! MEJOR SUERTE A LA PROXIMA!");
 	}	
+	getch();
 }
 
 bool EscaleraReal(carta* mano,unsigned int HandSize){
@@ -559,7 +533,6 @@ void ClearScreen(){
 
 void PrintHand(carta* mano, unsigned int HandS){
 	ClearScreen();
-
 	//Primera carta
 	/*start_color();
 	init_pair(1,COLOR_RED,COLOR_WHITE);
