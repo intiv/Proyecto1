@@ -39,6 +39,8 @@ unsigned int GetApuesta(unsigned int&);
 void Random2(carta*,carta*,vector<int>&,int*,int);
 void Jugada(carta*,unsigned int,unsigned int,unsigned int&);
 bool FileExists(const char* Archivo);
+void CargarArchivo(vector<string>&,const char*);
+void EscribirArchivo(const char*,unsigned int=100);
 
 int main(int argc, char* argv[]){
 	srand(time(0));
@@ -48,19 +50,9 @@ int main(int argc, char* argv[]){
 	unsigned int Dinero;
 	bool nRonda=false;
 	vector<string> datos;
-	if(FileExists(Archivo)){
-		ifstream reader("Datos.txt");
-		string line;
-		getline(reader,line);
-		stringstream ss(line);
-		while(ss.good()){
-			string sub;
-			getline(ss,sub,',');
-			datos.push_back(sub);
-		}
-		if(datos.at(0)=="True"){
-			nRonda=true;
-		}
+	CargarArchivo(datos,Archivo);	
+	if(datos.at(0)=="True"){
+		nRonda=true;
 	}
 	const unsigned int size=52;
 	carta* Deck=new carta[size];
@@ -69,6 +61,7 @@ int main(int argc, char* argv[]){
 		getch();
 		ClearScreen();
 		delete[] Deck;
+		exit(1);
 	}else{
 		bool continuar=false;
 		CrearDeck(Deck,size);	
@@ -132,19 +125,22 @@ int main(int argc, char* argv[]){
 			if(nRonda){
 				ClearScreen();
 				int op;
+				CargarArchivo(datos,Archivo);
+				int TempDinero=atoi(datos.at(1).c_str());
 				mvprintw(row/2-1,col/2-10,"-------------------");
 				mvprintw(row/2,col/2-10,"| Elija una opcion  |");
 				mvprintw(row/2+1,col/2-10,"-------------------");
-				mvprintw(row/2+2,col/2-20,"1.- Volver a jugar con %d dolares",Dinero);
-				mvprintw(row/2+3,col/2-20,"2.- Empezar nueva ronda con 100 dolares",Dinero);
-				mvprintw(row/2+4,col/2-20,"3.- Salir del juego",Dinero);
+				mvprintw(row/2+2,col/2-20,"1.- Volver a jugar con %d dolares",TempDinero);
+				mvprintw(row/2+3,col/2-20,"2.- Empezar nueva ronda con 100 dolares");
+				mvprintw(row/2+4,col/2-20,"3.- Salir del juego");
 				op=getch();
 				if(op==49){
-					Dinero=atoi(datos.at(1).c_str());
+					Dinero=TempDinero;
 				}else if(op==50){
 					Dinero=100;
 				}else if(op==51){
 					ClearScreen();
+					
 					Salida=true;
 					continuar=false;
 					break;
@@ -153,15 +149,18 @@ int main(int argc, char* argv[]){
 			if(Dinero>0){	
 				draw(mano,Deck,HandSize,size);
 				PrintHand(mano,HandSize);
+				
 				mvprintw(22,0,"Dinero: %d",Dinero);
 				int apuesta=GetApuesta(Dinero);
 				mvprintw(22,0,"Dinero: %d",Dinero);
 				mvprintw(23,0,"Apuesta: %d",apuesta);
-				refresh();	
+					
 				if(apuesta==0){
 					nRonda=true;
+					EscribirArchivo(Archivo,Dinero);
 				}else{
 					PrintHand(mano,HandSize);
+					
 					mvprintw(22,0,"Dinero: %d",Dinero);
 					mvprintw(23,0,"Apuesta: %d",apuesta);
 					mvprintw(18,0,"Desea Cambiar cartas [S= Si/N= No]? ");
@@ -171,24 +170,26 @@ int main(int argc, char* argv[]){
 						ClearScreen();	
 					}
 					PrintHand(mano,HandSize);
+					
 					sort(mano,HandSize);
 					mvprintw(20,0,"Dinero: %d",Dinero);
 					mvprintw(21,0,"Apuesta: %d",apuesta);
 					mvprintw(18,0,"Esta es su nueva mano, Presiona cualquier tecla para ver el resultado!");
+					
 					getch();
 					Jugada(mano,HandSize,apuesta,Dinero);
+					EscribirArchivo(Archivo,Dinero);
 				}
 			}else{
 				ClearScreen();
 				mvprintw(0,0,"Ya no tiene dinero");
+				Dinero=100;
+				EscribirArchivo(Archivo,Dinero);
 				continuar=false;
 			}
 		}
-		if(FileExists(Archivo)&&Salida){
-			ofstream salida;
-			salida.open(Archivo,std::ios::trunc);
-			salida<<"True,"<<Dinero;
-			salida.close();
+		if(Salida){
+			EscribirArchivo(Archivo,Dinero);
 		}else{
 			ofstream salida;
 			salida.open(Archivo,std::ios::trunc);
@@ -197,7 +198,8 @@ int main(int argc, char* argv[]){
 		}
 		int maxy,maxx;
 		getmaxyx(stdscr,maxy,maxx);
-		mvprintw(maxy/2-10,maxx/2-10,"GRACIAS POR JUGAR!");
+		
+		mvprintw(maxy/2,maxx/2-20,"GRACIAS POR JUGAR!");
 		delete[] Deck;
 		delete[] mano;
 		Deck=NULL;
@@ -206,6 +208,31 @@ int main(int argc, char* argv[]){
 	}	
 	endwin();
 	return 0;
+}
+
+void CargarArchivo(vector<string> &datos,const char* Archivo){
+	if(FileExists(Archivo)){	
+		datos.clear();
+		ifstream reader(Archivo);
+		string line;
+		getline(reader,line);
+		stringstream ss(line);
+		while(ss.good()){
+			string sub;
+			getline(ss,sub,',');
+			datos.push_back(sub);
+		}
+	}
+
+}
+
+void EscribirArchivo(const char* Archivo,unsigned int Dinero){
+	if(FileExists(Archivo)){
+		ofstream salida;
+		salida.open(Archivo,std::ios::trunc);
+		salida<<"True,"<<Dinero;
+		salida.close();
+	}
 }
 
 void sort(carta* mano,unsigned int HandSize){
@@ -553,14 +580,14 @@ void ClearScreen(){
 void PrintHand(carta* mano, unsigned int HandS){
 	ClearScreen();
 	//Primera carta
-	/*start_color();
+	start_color();
 	init_pair(1,COLOR_RED,COLOR_WHITE);
 	init_pair(2,COLOR_BLACK,COLOR_WHITE);
-	if(mano[0].getSimbolo()=='D'||mano[0].getSimbolo()=='C'){	
+	if(mano[0].getSimbolo()=='D'||mano[0].getSimbolo()=='C'){
 		attron(COLOR_PAIR(1));
 	}else{
 		attron(COLOR_PAIR(2));
-	}*/
+	}
 	mvprintw(0,0,"---------------");
 	if(mano[0].getLetra()=='J'||mano[0].getLetra()=='Q'||mano[0].getLetra()=='K'||mano[0].getLetra()=='A'){
 		mvprintw(1,0,"|%c           %c|",mano[0].getLetra(),mano[0].getLetra());
@@ -590,14 +617,19 @@ void PrintHand(carta* mano, unsigned int HandS){
 	}
 	mvprintw(12,0,"---------------");
 	
-	/*if(mano[0].getSimbolo()=='D'||mano[0].getSimbolo()=='C'){	
+	if(mano[0].getSimbolo()=='D'||mano[0].getSimbolo()=='C'){	
 		attroff(COLOR_PAIR(1));
 	}else{
 		attroff(COLOR_PAIR(2));
 	}
-	refresh();*/
 	mvprintw(13,7,"1");
+	
 	//segunda carta	
+	if(mano[1].getSimbolo()=='D'||mano[1].getSimbolo()=='C'){
+		wattron(stdscr,COLOR_PAIR(1));
+	}else{
+		wattron(stdscr,COLOR_PAIR(2));
+	}
 	mvprintw(0,20,"---------------");
 	if(mano[1].getLetra()=='J'||mano[1].getLetra()=='Q'||mano[1].getLetra()=='K'||mano[1].getLetra()=='A'){
 		mvprintw(1,20,"|%c           %c|",mano[1].getLetra(),mano[1].getLetra());
@@ -626,8 +658,19 @@ void PrintHand(carta* mano, unsigned int HandS){
 		}
 	}
 	mvprintw(12,20,"---------------");
+	if(mano[1].getSimbolo()=='D'||mano[1].getSimbolo()=='C'){	
+		wattroff(stdscr,COLOR_PAIR(1));
+	}else{
+		wattroff(stdscr,COLOR_PAIR(2));
+	}
+	
 	mvprintw(13,27,"2");
 	//Tercera carta
+	if(mano[2].getSimbolo()=='D'||mano[2].getSimbolo()=='C'){
+		attron(COLOR_PAIR(1));
+	}else{
+		attron(COLOR_PAIR(2));
+	}
 	mvprintw(0,40,"---------------");
 	if(mano[2].getLetra()=='J'||mano[2].getLetra()=='Q'||mano[2].getLetra()=='K'||mano[2].getLetra()=='A'){
 		mvprintw(1,40,"|%c           %c|",mano[2].getLetra(),mano[2].getLetra());
@@ -656,8 +699,19 @@ void PrintHand(carta* mano, unsigned int HandS){
 		}
 	}
 	mvprintw(12,40,"---------------");
+	if(mano[2].getSimbolo()=='D'||mano[2].getSimbolo()=='C'){	
+		attroff(COLOR_PAIR(1));
+	}else{
+		attroff(COLOR_PAIR(2));
+	}
 	mvprintw(13,47,"3");
+	
 	//Cuarta carta
+	if(mano[3].getSimbolo()=='D'||mano[3].getSimbolo()=='C'){
+		attron(COLOR_PAIR(1));
+	}else{
+		attron(COLOR_PAIR(2));
+	}
 	mvprintw(0,60,"---------------");
 	if(mano[3].getLetra()=='J'||mano[3].getLetra()=='Q'||mano[3].getLetra()=='K'||mano[3].getLetra()=='A'){
 		mvprintw(1,60,"|%c           %c|",mano[3].getLetra(),mano[3].getLetra());
@@ -686,8 +740,19 @@ void PrintHand(carta* mano, unsigned int HandS){
 		}
 	}
 	mvprintw(12,60,"---------------");
+	if(mano[3].getSimbolo()=='D'||mano[3].getSimbolo()=='C'){	
+		attroff(COLOR_PAIR(1));
+	}else{
+		attroff(COLOR_PAIR(2));
+	}
+	
 	mvprintw(13,67,"4");
 	//Quinta carta
+	if(mano[4].getSimbolo()=='D'||mano[4].getSimbolo()=='C'){
+		attron(COLOR_PAIR(1));
+	}else{
+		attron(COLOR_PAIR(2));
+	}
 	mvprintw(0,80,"---------------");
 	if(mano[4].getLetra()=='J'||mano[4].getLetra()=='Q'||mano[4].getLetra()=='K'||mano[4].getLetra()=='A'){
 		mvprintw(1,80,"|%c           %c|",mano[4].getLetra(),mano[4].getLetra());
@@ -716,7 +781,13 @@ void PrintHand(carta* mano, unsigned int HandS){
 		}
 	}
 	mvprintw(12,80,"---------------");
+	if(mano[4].getSimbolo()=='D'||mano[4].getSimbolo()=='C'){	
+		attroff(COLOR_PAIR(1));
+	}else{
+		attroff(COLOR_PAIR(2));
+	}
 	mvprintw(13,87,"5");
+	
 }
 
 void CrearDeck(carta* Deck,unsigned int size){
